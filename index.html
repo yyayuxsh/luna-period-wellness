@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna — Period Wellness App 🌸</title>
+    <meta name="description" content="Luna helps you track your menstrual cycle, log symptoms, practice self-care, and feel your best every day of the month.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="app">
+
+    <!-- ===== SETUP MODAL ===== -->
+    <div id="setup-modal" class="modal-overlay">
+        <div class="modal-card setup-modal-card">
+            <div class="setup-logo">🌸</div>
+            <h1 class="setup-title">Welcome to Luna</h1>
+            <p class="setup-subtitle">Your personal period wellness companion</p>
+
+            <div class="setup-steps">
+                <div class="setup-step active" id="step-1">
+                    <h3>What's your name?</h3>
+                    <input type="text" id="setup-name" placeholder="Your name" class="setup-input" maxlength="30" onkeydown="if(event.key==='Enter')nextStep(2)">
+                    <button class="btn-primary" onclick="nextStep(2)" id="step1-next">Continue →</button>
+                </div>
+                <div class="setup-step" id="step-2">
+                    <h3>When did your last period start?</h3>
+                    <input type="date" id="setup-last-period" class="setup-input">
+                    <button class="btn-primary" onclick="nextStep(3)" id="step2-next">Continue →</button>
+                </div>
+                <div class="setup-step" id="step-3">
+                    <h3>Average cycle length?</h3>
+                    <p class="step-hint">Most cycles are 21–35 days. Average is 28.</p>
+                    <div class="number-picker">
+                        <button class="picker-btn" onclick="adjustSetupVal('cycleLength', -1, 'setup-cycle-val', 21, 45)" id="setup-cycle-minus">−</button>
+                        <span id="setup-cycle-val" class="picker-val">28</span>
+                        <button class="picker-btn" onclick="adjustSetupVal('cycleLength', 1, 'setup-cycle-val', 21, 45)" id="setup-cycle-plus">+</button>
+                    </div>
+                    <span class="picker-label">days</span>
+                    <button class="btn-primary" onclick="nextStep(4)" id="step3-next">Continue →</button>
+                </div>
+                <div class="setup-step" id="step-4">
+                    <h3>How long does your period last?</h3>
+                    <div class="number-picker">
+                        <button class="picker-btn" onclick="adjustSetupVal('periodLength', -1, 'setup-period-val', 2, 10)" id="setup-period-minus">−</button>
+                        <span id="setup-period-val" class="picker-val">5</span>
+                        <button class="picker-btn" onclick="adjustSetupVal('periodLength', 1, 'setup-period-val', 2, 10)" id="setup-period-plus">+</button>
+                    </div>
+                    <span class="picker-label">days</span>
+                    <button class="btn-primary" onclick="nextStep(5)" id="step4-next">Continue →</button>
+                </div>
+                <div class="setup-step" id="step-5">
+                    <h3>Partner's name? <span class="optional">(optional)</span></h3>
+                    <p class="step-hint">For the partner view feature 💕</p>
+                    <input type="text" id="setup-partner-name" placeholder="Their name" class="setup-input" maxlength="30">
+                    <button class="btn-primary" onclick="completeSetup()" id="setup-finish-btn">Let's go! 🌸</button>
+                </div>
+            </div>
+
+            <div class="setup-progress">
+                <div class="progress-dot active" id="dot-1"></div>
+                <div class="progress-dot" id="dot-2"></div>
+                <div class="progress-dot" id="dot-3"></div>
+                <div class="progress-dot" id="dot-4"></div>
+                <div class="progress-dot" id="dot-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div id="main-app" class="hidden">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <span class="app-logo">🌸</span>
+                <span class="app-name">Luna</span>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="showSettings()" title="Settings" id="settings-btn">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Pages Container -->
+        <main class="pages-container">
+
+            <!-- HOME PAGE -->
+            <div id="page-home" class="page active">
+                <div class="page-content">
+                    <div class="greeting-section">
+                        <p class="greeting-text" id="greeting-text">Good morning 🌸</p>
+                        <h2 class="greeting-name" id="greeting-name">Welcome back</h2>
+                    </div>
+
+                    <!-- Cycle Hero Card -->
+                    <div class="cycle-hero-card">
+                        <div class="cycle-hero-inner">
+                            <div class="cycle-day-block">
+                                <span class="cycle-day-number" id="cycle-day-num">—</span>
+                                <span class="cycle-day-label">Cycle Day</span>
+                            </div>
+                            <div class="cycle-phase-block">
+                                <span class="phase-badge" id="phase-badge">—</span>
+                                <p class="phase-desc" id="phase-description">Loading...</p>
+                                <div class="next-period-row">
+                                    <span class="next-period-text" id="next-period-text">📅 Next period: calculating...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cycle-progress-bar">
+                            <div class="cycle-progress-fill" id="cycle-progress-fill"></div>
+                        </div>
+                        <div class="cycle-phase-dots" id="cycle-phase-dots"></div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="navigateTo('log')" id="qa-log">
+                            <span class="qa-icon">📝</span>
+                            <span class="qa-label">Log Today</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="navigateTo('care')" id="qa-care">
+                            <span class="qa-icon">🌿</span>
+                            <span class="qa-label">Self-Care</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="navigateTo('calendar')" id="qa-calendar">
+                            <span class="qa-icon">📅</span>
+                            <span class="qa-label">Calendar</span>
+                        </button>
+                        <button class="quick-action-btn partner-action" onclick="navigateTo('partner')" id="qa-partner">
+                            <span class="qa-icon">💕</span>
+                            <span class="qa-label">Partner</span>
+                        </button>
+                    </div>
+
+                    <!-- Today's Quick Stats -->
+                    <div class="home-stats-row">
+                        <div class="home-stat">
+                            <span class="home-stat-val" id="stat-water">0</span>
+                            <span class="home-stat-label">💧 Glasses</span>
+                        </div>
+                        <div class="home-stat">
+                            <span class="home-stat-val" id="stat-mood">—</span>
+                            <span class="home-stat-label">Today's Mood</span>
+                        </div>
+                        <div class="home-stat">
+                            <span class="home-stat-val" id="stat-flow">—</span>
+                            <span class="home-stat-label">🩸 Flow</span>
+                        </div>
+                    </div>
+
+                    <!-- Today's Tip -->
+                    <div class="tip-card">
+                        <div class="tip-header">
+                            <span class="tip-badge">💡 Today's Tip</span>
+                        </div>
+                        <p class="tip-text" id="todays-tip">Loading...</p>
+                    </div>
+
+                    <!-- Phase Guide -->
+                    <div class="phase-guide-card">
+                        <h4 class="phase-guide-title" id="phase-guide-title">Phase Guide</h4>
+                        <div class="phase-guide-content" id="phase-guide-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALENDAR PAGE -->
+            <div id="page-calendar" class="page">
+                <div class="page-content">
+                    <div class="page-header">
+                        <h2 class="page-title">📅 Calendar</h2>
+                    </div>
+                    <div class="calendar-nav">
+                        <button class="cal-nav-btn" onclick="changeMonth(-1)" id="prev-month-btn">‹</button>
+                        <span class="cal-month-label" id="cal-month-label">June 2026</span>
+                        <button class="cal-nav-btn" onclick="changeMonth(1)" id="next-month-btn">›</button>
+                    </div>
+                    <div class="calendar-card">
+                        <div class="calendar-days-header">
+                            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+                            <span>Th</span><span>Fr</span><span>Sa</span>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid"></div>
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item"><span class="legend-dot period-dot"></span> Period</div>
+                        <div class="legend-item"><span class="legend-dot predicted-dot"></span> Predicted</div>
+                        <div class="legend-item"><span class="legend-dot ovulation-dot"></span> Ovulation</div>
+                        <div class="legend-item"><span class="legend-dot today-dot"></span> Today</div>
+                    </div>
+                    <div class="selected-day-card hidden" id="selected-day-card">
+                        <h4 id="selected-day-title">—</h4>
+                        <div id="selected-day-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOG PAGE -->
+            <div id="page-log" class="page">
+                <div class="page-content">
+                    <div class="page-header log-page-header">
+                        <h2 class="page-title">📝 Daily Log</h2>
+                        <input type="date" id="log-date" class="date-picker" onchange="loadLogForDate()">
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">🩸 Flow Intensity</h4>
+                        <div class="flow-options" id="flow-options">
+                            <button class="flow-btn" data-flow="none" onclick="selectFlow('none')" id="flow-none">○<span>None</span></button>
+                            <button class="flow-btn" data-flow="spotting" onclick="selectFlow('spotting')" id="flow-spotting">·<span>Spotting</span></button>
+                            <button class="flow-btn" data-flow="light" onclick="selectFlow('light')" id="flow-light">🩸<span>Light</span></button>
+                            <button class="flow-btn" data-flow="medium" onclick="selectFlow('medium')" id="flow-medium">🩸🩸<span>Medium</span></button>
+                            <button class="flow-btn" data-flow="heavy" onclick="selectFlow('heavy')" id="flow-heavy">🩸🩸🩸<span>Heavy</span></button>
+                        </div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">🤒 Symptoms</h4>
+                        <div class="symptoms-grid" id="symptoms-grid"></div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">😊 Mood</h4>
+                        <div class="mood-options" id="mood-options">
+                            <button class="mood-btn" onclick="selectMood('😄')" id="mood-great">😄<span>Great</span></button>
+                            <button class="mood-btn" onclick="selectMood('😊')" id="mood-good">😊<span>Good</span></button>
+                            <button class="mood-btn" onclick="selectMood('😐')" id="mood-okay">😐<span>Okay</span></button>
+                            <button class="mood-btn" onclick="selectMood('😔')" id="mood-low">😔<span>Low</span></button>
+                            <button class="mood-btn" onclick="selectMood('😢')" id="mood-sad">😢<span>Sad</span></button>
+                            <button class="mood-btn" onclick="selectMood('😠')" id="mood-angry">😠<span>Angry</span></button>
+                            <button class="mood-btn" onclick="selectMood('😰')" id="mood-anxious">😰<span>Anxious</span></button>
+                            <button class="mood-btn" onclick="selectMood('🥰')" id="mood-loved">🥰<span>Loved</span></button>
+                        </div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">💧 Hydration</h4>
+                        <div class="counter-row">
+                            <button class="counter-btn" onclick="adjustWater(-1)" id="water-minus">−</button>
+                            <div class="counter-display">
+                                <span class="counter-value" id="water-count">0</span>
+                                <span class="counter-label">glasses of water</span>
+                            </div>
+                            <button class="counter-btn" onclick="adjustWater(1)" id="water-plus">+</button>
+                        </div>
+                        <div class="water-glasses-row" id="water-glasses"></div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">😴 Sleep</h4>
+                        <div class="counter-row">
+                            <button class="counter-btn" onclick="adjustSleep(-0.5)" id="sleep-minus">−</button>
+                            <div class="counter-display">
+                                <span class="counter-value" id="sleep-count">8</span>
+                                <span class="counter-label">hours of sleep</span>
+                            </div>
+                            <button class="counter-btn" onclick="adjustSleep(0.5)" id="sleep-plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">💊 Medications & Supplements</h4>
+                        <div class="meds-grid" id="meds-grid"></div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4 class="log-section-title">📓 Notes</h4>
+                        <textarea id="log-notes" class="log-textarea" placeholder="How are you feeling today? Any thoughts to capture..."></textarea>
+                    </div>
+
+                    <button class="btn-primary btn-save" onclick="saveLog()" id="save-log-btn">Save Log ✓</button>
+                    <div class="save-success hidden" id="save-success">✅ Log saved successfully!</div>
+                </div>
+            </div>
+
+            <!-- INSIGHTS PAGE -->
+            <div id="page-insights" class="page">
+                <div class="page-content">
+                    <div class="page-header">
+                        <h2 class="page-title">📊 Insights</h2>
+                    </div>
+                    <div class="insights-stats-row">
+                        <div class="insight-stat-card">
+                            <span class="is-icon">🔄</span>
+                            <span class="is-value" id="avg-cycle-val">28</span>
+                            <span class="is-label">Avg Cycle</span>
+                        </div>
+                        <div class="insight-stat-card">
+                            <span class="is-icon">📅</span>
+                            <span class="is-value" id="avg-period-val">5</span>
+                            <span class="is-label">Avg Period</span>
+                        </div>
+                        <div class="insight-stat-card">
+                            <span class="is-icon">📝</span>
+                            <span class="is-value" id="total-logs-val">0</span>
+                            <span class="is-label">Days Logged</span>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4 class="chart-title">😊 Mood This Month</h4>
+                        <canvas id="mood-chart" height="200"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4 class="chart-title">🤒 Most Common Symptoms</h4>
+                        <canvas id="symptoms-chart" height="200"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4 class="chart-title">💧 Hydration This Month</h4>
+                        <canvas id="water-chart" height="200"></canvas>
+                    </div>
+                    <div class="no-data-msg hidden" id="no-data-msg">
+                        <span class="no-data-icon">📊</span>
+                        <p>Start logging daily to see your insights here!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SELF-CARE PAGE -->
+            <div id="page-care" class="page">
+                <div class="page-content">
+                    <div class="page-header">
+                        <h2 class="page-title">🌿 Self-Care</h2>
+                        <p class="page-subtitle" id="care-subtitle">Caring for you today</p>
+                    </div>
+                    <div class="care-phase-banner" id="care-phase-banner"></div>
+                    <div class="care-cards-grid">
+                        <div class="care-card">
+                            <h4 class="care-card-title">🥗 Foods to Eat Now</h4>
+                            <ul class="care-list" id="food-recs"></ul>
+                        </div>
+                        <div class="care-card">
+                            <h4 class="care-card-title">🧘 Movement & Exercise</h4>
+                            <ul class="care-list" id="exercise-recs"></ul>
+                        </div>
+                        <div class="care-card">
+                            <h4 class="care-card-title">🏠 Home Remedies</h4>
+                            <ul class="care-list" id="remedy-recs"></ul>
+                        </div>
+                        <div class="care-card">
+                            <h4 class="care-card-title">💆 Mind & Wellness</h4>
+                            <ul class="care-list" id="mind-recs"></ul>
+                        </div>
+                    </div>
+                    <div class="affirmation-card">
+                        <div class="affirmation-stars">✨✨✨</div>
+                        <p class="affirmation-text" id="affirmation-text">"You are doing amazing."</p>
+                        <button class="btn-text" onclick="refreshAffirmation()" id="refresh-affirmation-btn">New affirmation ✨</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTNER VIEW PAGE -->
+            <div id="page-partner" class="page">
+                <div class="page-content">
+                    <div class="partner-hero">
+                        <div class="partner-hero-heart">💕</div>
+                        <h2 class="partner-hero-title">Partner Guide</h2>
+                        <p class="partner-hero-sub" id="partner-hero-sub">A gentle guide to supporting her 🌸</p>
+                    </div>
+
+                    <!-- Status Banner -->
+                    <div class="partner-status-card" id="partner-status-card">
+                        <div class="partner-status-badges">
+                            <span class="partner-day-badge" id="partner-day-badge">Day —</span>
+                            <span class="partner-phase-badge" id="partner-phase-badge">—</span>
+                        </div>
+                        <p class="partner-status-desc" id="partner-status-desc">Loading cycle info...</p>
+                    </div>
+
+                    <!-- What She Might Be Feeling -->
+                    <div class="partner-section feeling-section">
+                        <div class="partner-section-icon">💭</div>
+                        <h4 class="partner-section-title">What She Might Be Feeling</h4>
+                        <ul class="partner-list" id="partner-feelings-list"></ul>
+                    </div>
+
+                    <!-- How to Help -->
+                    <div class="partner-section help-section">
+                        <div class="partner-section-icon">🌟</div>
+                        <h4 class="partner-section-title">How You Can Help Today</h4>
+                        <ul class="partner-list" id="partner-help-list"></ul>
+                    </div>
+
+                    <!-- Things to Avoid -->
+                    <div class="partner-section avoid-section">
+                        <div class="partner-section-icon">🚫</div>
+                        <h4 class="partner-section-title">Things to Avoid</h4>
+                        <ul class="partner-list partner-avoid-list" id="partner-avoid-list"></ul>
+                    </div>
+
+                    <!-- Perfect Things to Say -->
+                    <div class="partner-section say-section">
+                        <div class="partner-section-icon">💬</div>
+                        <h4 class="partner-section-title">Perfect Things to Say</h4>
+                        <div class="say-quotes" id="partner-say-list"></div>
+                    </div>
+
+                    <!-- Comfort Treats -->
+                    <div class="partner-section treats-section">
+                        <div class="partner-section-icon">🍫</div>
+                        <h4 class="partner-section-title">Comfort Treats & Snacks</h4>
+                        <div class="treats-grid" id="partner-treats-list"></div>
+                    </div>
+
+                    <!-- Emergency Kit -->
+                    <div class="partner-section kit-section">
+                        <div class="partner-section-icon">🎒</div>
+                        <h4 class="partner-section-title">Partner Emergency Kit</h4>
+                        <p class="kit-subtitle">Have these ready, just in case:</p>
+                        <div class="kit-checklist" id="partner-kit-list"></div>
+                    </div>
+
+                    <!-- Send Love -->
+                    <div class="send-love-section">
+                        <button class="btn-love" onclick="sendLove()" id="send-love-btn">
+                            <span>💌</span>
+                            <span>Copy a Sweet Message</span>
+                        </button>
+                        <p class="send-love-hint">Copies a caring message to your clipboard</p>
+                        <div class="love-copied hidden" id="love-copied">✅ Copied! Send it to her 💕</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav" id="bottom-nav">
+            <button class="nav-item active" onclick="navigateTo('home')" id="nav-home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('calendar')" id="nav-calendar">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Calendar</span>
+            </button>
+            <button class="nav-item nav-log-btn" onclick="navigateTo('log')" id="nav-log">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">Log</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('insights')" id="nav-insights">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Insights</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('care')" id="nav-care">
+                <span class="nav-icon">🌿</span>
+                <span class="nav-label">Self-Care</span>
+            </button>
+            <button class="nav-item nav-partner-btn" onclick="navigateTo('partner')" id="nav-partner">
+                <span class="nav-icon">💕</span>
+                <span class="nav-label">Partner</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>⚙️ Settings</h3>
+                <button class="close-btn" onclick="hideSettings()" id="close-settings-btn">✕</button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-row">
+                    <label class="setting-label">Your Name</label>
+                    <input type="text" id="settings-name" class="settings-input" maxlength="30">
+                </div>
+                <div class="setting-row">
+                    <label class="setting-label">Partner's Name</label>
+                    <input type="text" id="settings-partner" class="settings-input" maxlength="30">
+                </div>
+                <div class="setting-row">
+                    <label class="setting-label">Cycle Length</label>
+                    <div class="settings-picker">
+                        <button onclick="adjustSettingLive('cycleLength',-1,'sl-cycle',21,45)" class="picker-btn" id="sl-cycle-minus">−</button>
+                        <span id="sl-cycle" class="picker-val">28</span>
+                        <button onclick="adjustSettingLive('cycleLength',1,'sl-cycle',21,45)" class="picker-btn" id="sl-cycle-plus">+</button>
+                        <span class="picker-unit">days</span>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label class="setting-label">Period Length</label>
+                    <div class="settings-picker">
+                        <button onclick="adjustSettingLive('periodLength',-1,'sl-period',2,10)" class="picker-btn" id="sl-period-minus">−</button>
+                        <span id="sl-period" class="picker-val">5</span>
+                        <button onclick="adjustSettingLive('periodLength',1,'sl-period',2,10)" class="picker-btn" id="sl-period-plus">+</button>
+                        <span class="picker-unit">days</span>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label class="setting-label">Last Period Start</label>
+                    <input type="date" id="settings-last-period" class="settings-input">
+                </div>
+                <button class="btn-primary" onclick="saveSettings()" id="save-settings-btn">Save Changes</button>
+                <button class="btn-danger" onclick="resetApp()" id="reset-app-btn">Reset All Data</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>
