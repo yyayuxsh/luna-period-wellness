@@ -4,6 +4,8 @@
    =================================== */
 
 'use strict';
+console.log("Luna starting...");
+console.log("Supabase:", supabase);
 
 // ============================================================
 // CONTENT DATABASE
