@@ -1,8 +1,8 @@
 const SUPABASE_URL = "https://dfsppwmuzwgkixmbqmvi.supabase.co";
 
-const SUPABASE_ANON_KEY = "sb_publishable_6ffW1Z9m7NYWrY3aS0Bh1g_ZwLtSJPD";
+const SUPABASE_ANON_KEY = "YOUR_PUBLISHABLE_KEY";
 
-const supabase = window.supabase.createClient(
+const lunaSupabase = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
