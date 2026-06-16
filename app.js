@@ -5,7 +5,8 @@
 
 'use strict';
 console.log("Luna starting...");
-console.log("Supabase:", supabase);
+console.log("Supabase:", lunaSupabase);
+
 
 // ============================================================
 // CONTENT DATABASE
