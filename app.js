@@ -467,9 +467,10 @@ let state = {
     settings: { ...DEFAULT_SETTINGS },
     logs: {},
     tempSetup: {
-        cycleLength: 28,
-        periodLength: 5
-    }
+    role: '',
+    cycleLength: 28,
+    periodLength: 5
+}
 };
 
 function saveState() {
