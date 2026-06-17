@@ -691,6 +691,7 @@ function adjustSetupVal(key, delta, elId, min, max) {
 
 function completeSetup() {
     state.settings.name = state.tempSetup.name || '';
+   state.settings.role = state.tempSetup.role || '';
     state.settings.partnerName = document.getElementById('setup-partner-name').value.trim();
     state.settings.cycleLength = state.tempSetup.cycleLength || 28;
     state.settings.periodLength = state.tempSetup.periodLength || 5;
