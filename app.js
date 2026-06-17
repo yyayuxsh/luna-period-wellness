@@ -690,6 +690,7 @@ function adjustSetupVal(key, delta, elId, min, max) {
 }
 
 function completeSetup() {
+   console.log("COMPLETE SETUP RUNNING");
     state.settings.name = state.tempSetup.name || '';
    state.settings.role = state.tempSetup.role || '';
     state.settings.partnerName = document.getElementById('setup-partner-name').value.trim();
