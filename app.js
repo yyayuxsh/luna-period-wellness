@@ -696,6 +696,10 @@ function completeSetup() {
     state.settings.cycleLength = state.tempSetup.cycleLength || 28;
     state.settings.periodLength = state.tempSetup.periodLength || 5;
     state.settings.lastPeriodStart = state.tempSetup.lastPeriodStart || getToday();
+   if (state.settings.role !== 'partner') {
+    state.settings.inviteCode =
+        Math.random().toString(36).substring(2, 8).toUpperCase();
+}
 
     saveState();
     showMainApp();
