@@ -4,8 +4,7 @@
    =================================== */
 
 'use strict';
-console.log("Luna starting...");
-console.log("Supabase:", lunaSupabase);
+
 
 
 // ============================================================
