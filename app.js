@@ -724,6 +724,21 @@ function renderHome() {
     const hours = now.getHours();
     let greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
     const name = state.settings.name;
+   if (state.settings.role === 'partner') {
+    document.getElementById('greeting-text').textContent = greeting + ' 🌸';
+    document.getElementById('greeting-name').textContent =
+        name ? `Hey, ${name}!` : 'Welcome back';
+
+    document.getElementById('cycle-day-num').textContent = '❤';
+
+    const phaseBadge = document.getElementById('phase-badge');
+    phaseBadge.textContent = 'PARTNER';
+
+    document.getElementById('phase-description').textContent =
+        'You are connected as a supportive partner.';
+
+    return;
+}
 
     document.getElementById('greeting-text').textContent = greeting + ' 🌸';
     document.getElementById('greeting-name').textContent = name ? `Hey, ${name}!` : 'Welcome back';
