@@ -457,6 +457,7 @@ const PARTNER_DATA = {
 const DEFAULT_SETTINGS = {
     name: '',
     partnerName: '',
+    role: '',
     cycleLength: 28,
     periodLength: 5,
     lastPeriodStart: null
