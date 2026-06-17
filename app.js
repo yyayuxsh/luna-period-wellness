@@ -1383,6 +1383,12 @@ async function initWithAuth() {
 function init() {
     const hasData = loadState();
 
+    // Skip setup for partners
+    if (state.tempSetup.role === 'partner') {
+        showMainApp();
+        return;
+    }
+
     if (hasData && state.settings.name && state.settings.lastPeriodStart) {
         showMainApp();
     } else {
@@ -1390,12 +1396,15 @@ function init() {
         if (state.tempSetup.name) {
             document.getElementById('setup-name').value = state.tempSetup.name;
         }
+
         // Set default date for setup
         const today = getToday();
         document.getElementById('setup-last-period').value = today;
+
         // Show setup
         document.getElementById('setup-modal').classList.remove('hidden');
     }
+}
 
     // Initialize log date
     document.getElementById('log-date').value = getToday();
