@@ -484,6 +484,13 @@ function loadState() {
             const parsed = JSON.parse(saved);
             state.settings = { ...DEFAULT_SETTINGS, ...parsed.settings };
             state.logs = parsed.logs || {};
+
+state.tempSetup = {
+    role: '',
+    cycleLength: 28,
+    periodLength: 5,
+    ...parsed.tempSetup
+};
             return true;
         }
     } catch (e) { console.error('Failed to load state:', e); }
