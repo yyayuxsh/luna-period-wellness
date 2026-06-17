@@ -5,7 +5,121 @@
 
 'use strict';
 
+// ============================================================
+// SUPABASE — replace with your project values
+// ============================================================
 
+const sb = window.lunaSupabase;
+// ============================================================
+// AUTH HELPERS
+// ============================================================
+
+function showAuthPanel(panel) {
+    document.getElementById('auth-panel-signup').classList.toggle('hidden', panel !== 'signup');
+    document.getElementById('auth-panel-login').classList.toggle('hidden',  panel !== 'login');
+    clearAuthBanners();
+}
+
+function clearAuthBanners() {
+    ['auth-error','auth-success'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = '';
+        el.classList.add('hidden');
+    });
+}
+
+function showAuthBanner(id, msg) {
+    clearAuthBanners();
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+
+function setAuthLoading(btnId, loading) {
+    const btn  = document.getElementById(btnId);
+    const text = btn.querySelector('.auth-btn-text');
+    const spin = btn.querySelector('.auth-spinner');
+    btn.disabled = loading;
+    text.classList.toggle('hidden', loading);
+    spin.classList.toggle('hidden', !loading);
+}
+
+async function handleSignup() {
+    const name     = document.getElementById('auth-signup-name').value.trim();
+    const email    = document.getElementById('auth-signup-email').value.trim();
+    const password = document.getElementById('auth-signup-password').value;
+    const role     = document.querySelector('input[name="auth-role"]:checked').value;
+
+    if (!name)            return showAuthBanner('auth-error', 'Please enter your name.');
+    if (!email)           return showAuthBanner('auth-error', 'Please enter your email.');
+    if (password.length < 6) return showAuthBanner('auth-error', 'Password must be at least 6 characters.');
+
+    setAuthLoading('btn-signup', true);
+    try {
+        const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
+        if (authError) throw authError;
+
+        const userId = authData.user?.id;
+        if (userId) {
+            const { error: profileError } = await sb.from('profiles').insert({
+                id:         userId,
+                name,
+                email,
+                role,
+                created_at: new Date().toISOString()
+            });
+            if (profileError) console.warn('Profile save failed:', profileError.message);
+
+            // Pre-fill setup with the name from signup
+            state.tempSetup.name = name;
+        }
+
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+            enterApp();
+        } else {
+            showAuthBanner('auth-success', '✓ Account created! Check your email to confirm, then sign in.');
+            showAuthPanel('login');
+        }
+    } catch (err) {
+        showAuthBanner('auth-error', err.message || 'Something went wrong. Please try again.');
+    } finally {
+        setAuthLoading('btn-signup', false);
+    }
+}
+
+async function handleLogin() {
+    const email    = document.getElementById('auth-login-email').value.trim();
+    const password = document.getElementById('auth-login-password').value;
+
+    if (!email)    return showAuthBanner('auth-error', 'Please enter your email.');
+    if (!password) return showAuthBanner('auth-error', 'Please enter your password.');
+
+    setAuthLoading('btn-login', true);
+    try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        enterApp();
+    } catch (err) {
+        showAuthBanner('auth-error', err.message || 'Sign-in failed. Check your credentials.');
+    } finally {
+        setAuthLoading('btn-login', false);
+    }
+}
+
+function enterApp() {
+    document.getElementById('auth-screen').classList.add('hidden');
+    init(); // run existing Luna init
+}
+
+// Keyboard submit support for auth
+document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const authScreen = document.getElementById('auth-screen');
+    if (!authScreen || authScreen.classList.contains('hidden')) return;
+    const loginVisible = !document.getElementById('auth-panel-login').classList.contains('hidden');
+    loginVisible ? handleLogin() : handleSignup();
+});
 
 // ============================================================
 // CONTENT DATABASE
@@ -1220,7 +1334,7 @@ function saveSettings() {
 function resetApp() {
     if (confirm('Are you sure? This will delete all your data and start over.')) {
         localStorage.removeItem('luna_state');
-        location.reload();
+        sb.auth.signOut().finally(() => location.reload());
     }
 }
 
@@ -1228,12 +1342,29 @@ function resetApp() {
 // INIT
 // ============================================================
 
+async function initWithAuth() {
+    // Check for existing Supabase session first
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+        // Already logged in — skip auth screen and go straight to Luna
+        document.getElementById('auth-screen').classList.add('hidden');
+        init();
+    } else {
+        // Show auth screen; keep setup-modal hidden until after login
+        document.getElementById('auth-screen').classList.remove('hidden');
+    }
+}
+
 function init() {
     const hasData = loadState();
 
     if (hasData && state.settings.name && state.settings.lastPeriodStart) {
         showMainApp();
     } else {
+        // Pre-fill name if we captured it during signup
+        if (state.tempSetup.name) {
+            document.getElementById('setup-name').value = state.tempSetup.name;
+        }
         // Set default date for setup
         const today = getToday();
         document.getElementById('setup-last-period').value = today;
@@ -1245,7 +1376,7 @@ function init() {
     document.getElementById('log-date').value = getToday();
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', initWithAuth);
 
 // Close settings modal on backdrop click
 document.addEventListener('click', (e) => {
