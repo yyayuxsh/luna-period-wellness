@@ -73,7 +73,8 @@ async function handleSignup() {
             // Pre-fill setup with the name from signup
            state.tempSetup.name = name;
 state.tempSetup.role = role;
-saveState();;
+saveState();
+           console.log("ROLE SAVED:", state.tempSetup);
         }
 
         const { data: { session } } = await sb.auth.getSession();
