@@ -1404,7 +1404,7 @@ function init() {
         // Show setup
         document.getElementById('setup-modal').classList.remove('hidden');
     }
-}
+
 
     // Initialize log date
     document.getElementById('log-date').value = getToday();
