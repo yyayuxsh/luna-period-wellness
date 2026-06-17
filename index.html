@@ -8,14 +8,90 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div id="app">
 
+    <!-- ===== AUTH SCREENS ===== -->
+    <div id="auth-screen" class="modal-overlay">
+        <div class="modal-card auth-card">
+
+            <!-- Logo -->
+            <div class="auth-logo">🌸</div>
+            <h1 class="setup-title">Luna</h1>
+            <p class="auth-tagline">Your personal period wellness companion</p>
+
+            <!-- Error / Success banners -->
+            <div class="auth-banner auth-banner--error hidden" id="auth-error"></div>
+            <div class="auth-banner auth-banner--success hidden" id="auth-success"></div>
+
+            <!-- SIGNUP PANEL -->
+            <div id="auth-panel-signup" class="auth-panel">
+                <h2 class="auth-panel-title">Create account</h2>
+
+                <div class="auth-field">
+                    <label class="auth-label" for="auth-signup-name">Your name</label>
+                    <input class="setup-input" type="text" id="auth-signup-name" placeholder="e.g. Aria" autocomplete="name" maxlength="30">
+                </div>
+                <div class="auth-field">
+                    <label class="auth-label" for="auth-signup-email">Email</label>
+                    <input class="setup-input" type="email" id="auth-signup-email" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="auth-field">
+                    <label class="auth-label" for="auth-signup-password">Password</label>
+                    <input class="setup-input" type="password" id="auth-signup-password" placeholder="At least 6 characters" autocomplete="new-password">
+                </div>
+                <div class="auth-field">
+                    <label class="auth-label">I am a…</label>
+                    <div class="auth-role-row">
+                        <label class="auth-role-btn">
+                            <input type="radio" name="auth-role" value="woman" checked>
+                            <span class="auth-role-label"><span class="auth-role-icon">🌸</span>Woman</span>
+                        </label>
+                        <label class="auth-role-btn">
+                            <input type="radio" name="auth-role" value="partner">
+                            <span class="auth-role-label"><span class="auth-role-icon">💙</span>Partner</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="btn-signup" onclick="handleSignup()">
+                    <span class="auth-btn-text">Create account</span>
+                    <span class="auth-spinner hidden"></span>
+                </button>
+
+                <p class="auth-switch">Already have an account? <a class="auth-link" onclick="showAuthPanel('login')">Sign in</a></p>
+            </div>
+
+            <!-- LOGIN PANEL -->
+            <div id="auth-panel-login" class="auth-panel hidden">
+                <h2 class="auth-panel-title">Welcome back</h2>
+
+                <div class="auth-field">
+                    <label class="auth-label" for="auth-login-email">Email</label>
+                    <input class="setup-input" type="email" id="auth-login-email" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="auth-field">
+                    <label class="auth-label" for="auth-login-password">Password</label>
+                    <input class="setup-input" type="password" id="auth-login-password" placeholder="Your password" autocomplete="current-password">
+                </div>
+
+                <button class="btn-primary" id="btn-login" onclick="handleLogin()">
+                    <span class="auth-btn-text">Sign in</span>
+                    <span class="auth-spinner hidden"></span>
+                </button>
+
+                <p class="auth-switch">New to Luna? <a class="auth-link" onclick="showAuthPanel('signup')">Create an account</a></p>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ===== SETUP MODAL ===== -->
-    <div id="setup-modal" class="modal-overlay">
+    <div id="setup-modal" class="modal-overlay hidden">
         <div class="modal-card setup-modal-card">
             <div class="setup-logo">🌸</div>
             <h1 class="setup-title">Welcome to Luna</h1>
@@ -504,8 +580,6 @@
     </div>
 
 </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <script src="supabase.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
