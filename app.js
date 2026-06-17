@@ -71,8 +71,9 @@ async function handleSignup() {
             if (profileError) console.warn('Profile save failed:', profileError.message);
 
             // Pre-fill setup with the name from signup
-            state.tempSetup.name = name;
-           state.tempSetup.role = role;
+           state.tempSetup.name = name;
+state.tempSetup.role = role;
+saveState();;
         }
 
         const { data: { session } } = await sb.auth.getSession();
