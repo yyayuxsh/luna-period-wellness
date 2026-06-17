@@ -701,6 +701,7 @@ function completeSetup() {
       console.log("GENERATING CODE");
     state.settings.inviteCode =
         Math.random().toString(36).substring(2, 8).toUpperCase();
+      console.log("INVITE CODE:", state.settings.inviteCode);
 }
 
     saveState();
