@@ -631,13 +631,21 @@ let setupStep = 1;
 function nextStep(step) {
     // Validate current step
     if (setupStep === 1) {
-        const name = document.getElementById('setup-name').value.trim();
-        if (!name) {
-            shakeElement('setup-name');
-            return;
-        }
-        state.tempSetup.name = name;
+    const name = document.getElementById('setup-name').value.trim();
+
+    if (!name) {
+        shakeElement('setup-name');
+        return;
     }
+
+    state.tempSetup.name = name;
+
+    // Skip period setup for partners
+    if (state.tempSetup.role === 'partner') {
+        completeSetup();
+        return;
+    }
+}
     if (setupStep === 2) {
         const date = document.getElementById('setup-last-period').value;
         if (!date) {
