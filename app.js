@@ -698,6 +698,7 @@ function completeSetup() {
     state.settings.periodLength = state.tempSetup.periodLength || 5;
     state.settings.lastPeriodStart = state.tempSetup.lastPeriodStart || getToday();
    if (state.settings.role !== 'partner') {
+      console.log("GENERATING CODE");
     state.settings.inviteCode =
         Math.random().toString(36).substring(2, 8).toUpperCase();
 }
