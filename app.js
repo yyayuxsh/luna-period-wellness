@@ -71,8 +71,13 @@ async function handleSignup() {
             if (profileError) console.warn('Profile save failed:', profileError.message);
 
             // Pre-fill setup with the name from signup
-           state.tempSetup.name = name;
+console.log("ROLE SELECTED:", role);
+
+state.tempSetup.name = name;
 state.tempSetup.role = role;
+
+console.log("TEMPSETUP AFTER SAVE:", state.tempSetup);
+
 saveState();
            console.log("ROLE SAVED:", state.tempSetup);
         }
