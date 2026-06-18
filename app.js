@@ -690,7 +690,7 @@ function adjustSetupVal(key, delta, elId, min, max) {
     document.getElementById(elId).textContent = state.tempSetup[key];
 }
 
-function completeSetup() {
+async function completeSetup() {
    console.log("COMPLETE SETUP RUNNING");
     state.settings.name = state.tempSetup.name || '';
    state.settings.role = state.tempSetup.role || '';
