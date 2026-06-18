@@ -731,6 +731,10 @@ function renderHome() {
     const hours = now.getHours();
     let greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
     const name = state.settings.name;
+   if (state.settings.role === 'woman') {
+    document.getElementById('greeting-text').textContent =
+        'Partner Code: ' + state.settings.inviteCode;
+}
    if (state.settings.role === 'partner') {
     document.getElementById('greeting-text').textContent = greeting + ' 🌸';
     document.getElementById('greeting-name').textContent =
