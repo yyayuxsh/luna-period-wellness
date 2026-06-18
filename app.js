@@ -66,6 +66,7 @@ async function handleSignup() {
                 name,
                 email,
                 role,
+               invite_code: null,
                 created_at: new Date().toISOString()
             });
             if (profileError) console.warn('Profile save failed:', profileError.message);
