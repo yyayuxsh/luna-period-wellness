@@ -703,6 +703,7 @@ async function completeSetup() {
     state.settings.inviteCode =
         Math.random().toString(36).substring(2, 8).toUpperCase();
       console.log("INVITE CODE:", state.settings.inviteCode);
+      console.log("READY TO SAVE TO SUPABASE");
 }
 
     saveState();
