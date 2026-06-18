@@ -727,6 +727,7 @@ function shakeElement(id) {
 // ============================================================
 
 function renderHome() {
+   alert("Partner Code: " + state.settings.inviteCode);
     const now = new Date();
     const hours = now.getHours();
     let greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
