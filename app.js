@@ -702,6 +702,9 @@ function completeSetup() {
       console.log("GENERATING CODE");
     state.settings.inviteCode =
         Math.random().toString(36).substring(2, 8).toUpperCase();
+      sb.from('profiles')
+  .update({ invite_code: state.settings.inviteCode })
+  .eq('id', (await sb.auth.getUser()).data.user.id);
       console.log("INVITE CODE:", state.settings.inviteCode);
 }
 
