@@ -704,6 +704,9 @@ async function completeSetup() {
         Math.random().toString(36).substring(2, 8).toUpperCase();
       console.log("INVITE CODE:", state.settings.inviteCode);
       console.log("READY TO SAVE TO SUPABASE");
+      const { data: userData } = await sb.auth.getUser();
+
+console.log("USER ID:", userData.user.id);
 }
 
     saveState();
