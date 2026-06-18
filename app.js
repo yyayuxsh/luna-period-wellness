@@ -759,7 +759,10 @@ console.log("INVITE CODE:", state.settings.inviteCode);
     return;
 }
 
-    document.getElementById('greeting-text').textContent = greeting + ' 🌸';
+   document.getElementById('greeting-text').textContent =
+    state.settings.role === 'woman'
+        ? 'Partner Code: ' + state.settings.inviteCode
+        : greeting + ' 🌸';
     document.getElementById('greeting-name').textContent = name ? `Hey, ${name}!` : 'Welcome back';
 
     const cycleDay = getCycleDay();
