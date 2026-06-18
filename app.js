@@ -735,12 +735,12 @@ function renderHome() {
 console.log("INVITE CODE:", state.settings.inviteCode);
    if (state.settings.role === 'woman') {
     document.getElementById('greeting-text').textContent =
-        'Partner Code: ' + state.settings.inviteCode;
+        '💞 Partner Code: ' + state.settings.inviteCode;
 }
    if (state.settings.role === 'partner') {
     if (state.settings.role === 'woman') {
     document.getElementById('greeting-text').textContent =
-        'Partner Code: ' + state.settings.inviteCode;
+        '💞 Partner Code: ' + state.settings.inviteCode;
 } else {
     document.getElementById('greeting-text').textContent =
         greeting + ' 🌸';
@@ -761,7 +761,7 @@ console.log("INVITE CODE:", state.settings.inviteCode);
 
    document.getElementById('greeting-text').textContent =
     state.settings.role === 'woman'
-        ? 'Partner Code: ' + state.settings.inviteCode
+        ? '💞 Partner Code: ' + state.settings.inviteCode
         : greeting + ' 🌸';
     document.getElementById('greeting-name').textContent = name ? `Hey, ${name}!` : 'Welcome back';
 
