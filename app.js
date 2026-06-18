@@ -738,7 +738,13 @@ console.log("INVITE CODE:", state.settings.inviteCode);
         'Partner Code: ' + state.settings.inviteCode;
 }
    if (state.settings.role === 'partner') {
-    document.getElementById('greeting-text').textContent = greeting + ' 🌸';
+    if (state.settings.role === 'woman') {
+    document.getElementById('greeting-text').textContent =
+        'Partner Code: ' + state.settings.inviteCode;
+} else {
+    document.getElementById('greeting-text').textContent =
+        greeting + ' 🌸';
+}
     document.getElementById('greeting-name').textContent =
         name ? `Hey, ${name}!` : 'Welcome back';
 
